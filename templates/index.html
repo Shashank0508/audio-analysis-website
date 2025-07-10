@@ -1,0 +1,3552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vocalytics - Audio Analysis Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #0056b3;
+            --success-color: #28a745;
+            --info-color: #17a2b8;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --bg-color: #ffffff;
+            --text-color: #212529;
+            --border-color: #dee2e6;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --card-bg: #ffffff;
+            --input-bg: #ffffff;
+            --hover-bg: #f8f9fa;
+            --body-gradient-start: #667eea;
+            --body-gradient-end: #764ba2;
+            --main-container-bg: rgba(255, 255, 255, 0.95);
+            --transcription-bg: #f8f9fa;
+            --insight-bg: #e3f2fd;
+            --suggestion-bg: #f3e5f5;
+            --file-info-bg: #e8f5e8;
+            --audio-controls-bg: #f8f9fa;
+            --segment-hover-bg: #e3f2fd;
+            --segment-active-bg: #fff3e0;
+            --segment-playing-bg: #e8f5e8;
+            --email-preview-bg: #f8f9fa;
+            --theme-toggle-bg: #ffffff;
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #0d6efd;
+            --secondary-color: #6c757d;
+            --success-color: #198754;
+            --info-color: #0dcaf0;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --light-color: #495057;
+            --dark-color: #212529;
+            --bg-color: #212529;
+            --text-color: #ffffff;
+            --border-color: #495057;
+            --shadow-color: rgba(255, 255, 255, 0.1);
+            --card-bg: #343a40;
+            --input-bg: #495057;
+            --hover-bg: #495057;
+            --body-gradient-start: #2c3e50;
+            --body-gradient-end: #34495e;
+            --main-container-bg: rgba(52, 58, 64, 0.95);
+            --transcription-bg: #495057;
+            --insight-bg: #1e3a5f;
+            --suggestion-bg: #3d1a4f;
+            --file-info-bg: #2d5a3d;
+            --audio-controls-bg: #495057;
+            --segment-hover-bg: #1e3a5f;
+            --segment-active-bg: #5a3d1a;
+            --segment-playing-bg: #2d5a3d;
+            --email-preview-bg: #495057;
+            --theme-toggle-bg: #343a40;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--body-gradient-start) 0%, var(--body-gradient-end) 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+        
+        .main-container {
+            background: var(--main-container-bg);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px var(--shadow-color);
+            backdrop-filter: blur(10px);
+            margin: 20px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-area {
+            border: 3px dashed var(--primary-color);
+            border-radius: 15px;
+            padding: 60px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: var(--hover-bg);
+            cursor: pointer;
+            color: var(--text-color);
+        }
+        
+        .upload-area:hover {
+            border-color: var(--secondary-color);
+            background: var(--hover-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px var(--shadow-color);
+        }
+        
+        .upload-area.dragover {
+            border-color: var(--success-color);
+            background: var(--hover-bg);
+        }
+        
+        .upload-icon {
+            font-size: 4rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #ff6b35, #f7931e);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #e55a2b, #d4841a);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 107, 53, 0.5);
+            color: white;
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+        }
+        
+        .progress-container {
+            margin: 20px 0;
+        }
+        
+        .analysis-section {
+            margin-top: 30px;
+        }
+        
+        .analysis-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px var(--shadow-color);
+            transition: all 0.3s ease;
+            color: var(--text-color);
+        }
+        
+        .analysis-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px var(--shadow-color);
+        }
+        
+        .transcription-text {
+            background: var(--transcription-bg);
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid var(--primary-color);
+            margin: 20px 0;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+        
+        .emotion-bar {
+            height: 20px;
+            border-radius: 10px;
+            margin: 5px 0;
+            transition: width 0.8s ease;
+        }
+        
+        .keyword-tag {
+            display: inline-block;
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .insight-item {
+            background: var(--insight-bg);
+            border-radius: 8px;
+            padding: 12px;
+            margin: 8px 0;
+            border-left: 4px solid var(--info-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+        
+        .suggestion-item {
+            background: var(--suggestion-bg);
+            border-radius: 8px;
+            padding: 12px;
+            margin: 8px 0;
+            border-left: 4px solid #9c27b0;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-item {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .sentiment-positive { color: #28a745; }
+        .sentiment-negative { color: #dc3545; }
+        .sentiment-neutral { color: #6c757d; }
+        
+        .section-title {
+            color: var(--text-color);
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .audio-controls {
+            background: var(--audio-controls-bg);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .transcription-segment {
+            padding: 8px 12px;
+            margin: 4px 0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+            color: var(--text-color);
+        }
+        
+        .transcription-segment:hover {
+            background-color: var(--segment-hover-bg);
+            border-left-color: var(--info-color);
+        }
+        
+        .transcription-segment.active {
+            background-color: var(--segment-active-bg);
+            border-left-color: var(--warning-color);
+            font-weight: 500;
+        }
+        
+        .transcription-segment.playing {
+            background-color: var(--segment-playing-bg);
+            border-left-color: var(--success-color);
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { background-color: var(--segment-playing-bg); }
+            50% { background-color: var(--success-color); opacity: 0.3; }
+            100% { background-color: var(--segment-playing-bg); }
+        }
+        
+        .segment-timestamp {
+            font-size: 0.8em;
+            color: #666;
+            margin-right: 8px;
+        }
+        
+        .word-highlight {
+            background-color: #ffeb3b;
+            padding: 2px 4px;
+            border-radius: 3px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .file-info {
+            background: var(--file-info-bg);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+        
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--theme-toggle-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px var(--shadow-color);
+        }
+        
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px var(--shadow-color);
+        }
+        
+        .theme-toggle i {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            transition: all 0.3s ease;
+        }
+        
+        .download-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+            padding: 15px;
+            background: var(--hover-bg);
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        
+        .download-buttons .btn {
+            border-radius: 25px;
+            padding: 12px 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 150px;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.9rem;
+        }
+        
+        .download-buttons .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px var(--shadow-color);
+        }
+        
+        .download-buttons .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .download-buttons .btn:hover::before {
+            left: 100%;
+        }
+        
+        .download-buttons .btn-outline-primary {
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            background: transparent;
+        }
+        
+        .download-buttons .btn-outline-primary:hover {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 8px 25px rgba(0, 123, 255, 0.3);
+        }
+        
+        .download-buttons .btn-outline-success {
+            color: var(--success-color);
+            border: 2px solid var(--success-color);
+            background: transparent;
+        }
+        
+        .download-buttons .btn-outline-success:hover {
+            background: linear-gradient(45deg, var(--success-color), #20c997);
+            border-color: var(--success-color);
+            color: white;
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+        }
+        
+        .download-buttons .btn-outline-info {
+            color: var(--info-color);
+            border: 2px solid var(--info-color);
+            background: transparent;
+        }
+        
+        .download-buttons .btn-outline-info:hover {
+            background: linear-gradient(45deg, var(--info-color), #138496);
+            border-color: var(--info-color);
+            color: white;
+            box-shadow: 0 8px 25px rgba(23, 162, 184, 0.3);
+        }
+        
+        .download-buttons .btn i {
+            margin-right: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .download-buttons .btn:active {
+            transform: translateY(-1px);
+        }
+        
+        /* Dark theme specific adjustments */
+        [data-theme="dark"] .download-buttons .btn-outline-primary:hover {
+            box-shadow: 0 8px 25px rgba(13, 110, 253, 0.4);
+        }
+        
+        [data-theme="dark"] .download-buttons .btn-outline-success:hover {
+            box-shadow: 0 8px 25px rgba(25, 135, 84, 0.4);
+        }
+        
+        [data-theme="dark"] .download-buttons .btn-outline-info:hover {
+            box-shadow: 0 8px 25px rgba(13, 202, 240, 0.4);
+        }
+        
+        .email-preview {
+            background: var(--email-preview-bg);
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid var(--border-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .email-preview::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--info-color), var(--success-color));
+        }
+        
+        .email-preview ul {
+            margin-bottom: 0;
+            padding-left: 20px;
+        }
+        
+        .email-preview li {
+            margin-bottom: 8px;
+            position: relative;
+        }
+        
+        .email-preview li::before {
+            content: '✓';
+            position: absolute;
+            left: -20px;
+            color: var(--success-color);
+            font-weight: bold;
+        }
+        
+        .modal-content {
+            border-radius: 20px;
+            box-shadow: 0 25px 50px var(--shadow-color);
+            background: var(--card-bg);
+            color: var(--text-color);
+            border: 2px solid var(--border-color);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--info-color));
+        }
+        
+        .modal-header {
+            border-bottom: 2px solid var(--border-color);
+            padding: 25px 30px;
+            background: var(--card-bg);
+            position: relative;
+        }
+        
+        .modal-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 30px;
+            right: 30px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+        }
+        
+        .modal-body {
+            padding: 30px;
+            background: var(--card-bg);
+        }
+        
+        .modal-footer {
+            border-top: 2px solid var(--border-color);
+            padding: 25px 30px;
+            background: var(--card-bg);
+            position: relative;
+        }
+        
+        .modal-footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 30px;
+            right: 30px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+        }
+        
+        .modal-title {
+            color: var(--primary-color);
+            font-weight: 700;
+            font-size: 1.4rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .modal-title i {
+            font-size: 1.5rem;
+            background: linear-gradient(45deg, var(--primary-color), var(--info-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+        
+        .form-label i {
+            color: var(--primary-color);
+            font-size: 1rem;
+        }
+        
+        .form-control {
+            border-radius: 12px;
+            border: 2px solid var(--border-color);
+            padding: 15px 20px;
+            transition: all 0.3s ease;
+            background: var(--input-bg);
+            color: var(--text-color);
+            font-size: 1rem;
+            position: relative;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.3rem rgba(0, 123, 255, 0.15);
+            background: var(--input-bg);
+            color: var(--text-color);
+            transform: translateY(-1px);
+        }
+        
+        .form-control:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-1px);
+        }
+        
+        .modal-footer .btn {
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 120px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .modal-footer .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .modal-footer .btn:hover::before {
+            left: 100%;
+        }
+        
+        .modal-footer .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--shadow-color);
+        }
+        
+        .modal-footer .btn-secondary {
+            background: var(--light-color);
+            border-color: var(--border-color);
+            color: var(--text-color);
+        }
+        
+        .modal-footer .btn-secondary:hover {
+            background: var(--hover-bg);
+            border-color: var(--border-color);
+            color: var(--text-color);
+        }
+        
+        .modal-footer .btn-primary {
+            background: linear-gradient(45deg, var(--primary-color), var(--info-color));
+            border: none;
+            color: white;
+        }
+        
+        .modal-footer .btn-primary:hover {
+            background: linear-gradient(45deg, var(--secondary-color), var(--primary-color));
+            box-shadow: 0 8px 25px rgba(0, 123, 255, 0.3);
+        }
+        
+        /* Dark theme specific modal adjustments */
+        [data-theme="dark"] .modal-footer .btn-primary:hover {
+            box-shadow: 0 8px 25px rgba(13, 110, 253, 0.4);
+        }
+        
+        [data-theme="dark"] .form-control:focus {
+            box-shadow: 0 0 0 0.3rem rgba(13, 110, 253, 0.15);
+        }
+        
+        /* Call Interface Styles */
+        .call-status-section {
+            margin-top: 30px;
+        }
+        
+        .call-info p {
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+        
+        .call-controls {
+            padding: 15px;
+            background: var(--hover-bg);
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+        
+        .call-controls .btn {
+            margin: 5px;
+            border-radius: 25px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+        
+        .call-controls .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px var(--shadow-color);
+        }
+        
+        .call-controls .btn-danger {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+            border: none;
+            color: white;
+        }
+        
+        .call-controls .btn-danger:hover {
+            background: linear-gradient(45deg, #c82333, #bd2130);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+        }
+        
+        .call-controls .btn-warning {
+            background: linear-gradient(45deg, #ffc107, #e0a800);
+            border: none;
+            color: #212529;
+        }
+        
+        .call-controls .btn-warning:hover {
+            background: linear-gradient(45deg, #e0a800, #d39e00);
+            box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
+        }
+        
+        .call-controls .btn-info {
+            background: linear-gradient(45deg, #17a2b8, #138496);
+            border: none;
+            color: white;
+        }
+        
+        .call-controls .btn-info:hover {
+            background: linear-gradient(45deg, #138496, #117a8b);
+            box-shadow: 0 5px 15px rgba(23, 162, 184, 0.4);
+        }
+        
+        .live-transcript {
+            background: var(--transcription-bg);
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 2px solid var(--border-color);
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .live-transcript .transcript-line {
+            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 5px;
+            background: var(--card-bg);
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .live-transcript .speaker-label {
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-right: 8px;
+        }
+        
+        .live-transcript .timestamp {
+            font-size: 0.8rem;
+            color: var(--text-color);
+            opacity: 0.7;
+            float: right;
+        }
+        
+        .transcript-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: var(--hover-bg);
+            border-radius: 8px;
+        }
+        
+        .transcript-controls .btn {
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+        
+        .transcript-controls .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px var(--shadow-color);
+        }
+        
+        .badge {
+            font-size: 0.8rem;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-weight: 600;
+        }
+        
+        .badge.bg-secondary {
+            background: linear-gradient(45deg, #6c757d, #5a6268) !important;
+        }
+        
+        .badge.bg-success {
+            background: linear-gradient(45deg, #28a745, #218838) !important;
+        }
+        
+        .badge.bg-warning {
+            background: linear-gradient(45deg, #ffc107, #e0a800) !important;
+            color: #212529 !important;
+        }
+        
+        .badge.bg-danger {
+            background: linear-gradient(45deg, #dc3545, #c82333) !important;
+        }
+        
+        .badge.bg-info {
+            background: linear-gradient(45deg, #17a2b8, #138496) !important;
+        }
+        
+        /* Form styling for call modal */
+        .form-check {
+            margin-bottom: 10px;
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+        }
+        
+        .form-check-label {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+        
+        .form-text {
+            font-size: 0.85rem;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+        
+        /* Real-time Dashboard Styles */
+        .dashboard-controls {
+            background: var(--hover-bg);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .dashboard-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        
+        .dashboard-section:hover {
+            box-shadow: 0 5px 15px var(--shadow-color);
+            transform: translateY(-2px);
+        }
+        
+        .dashboard-section h6 {
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            font-weight: 600;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 8px;
+        }
+        
+        /* Metric Cards */
+        .metric-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--info-color));
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.2);
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 123, 255, 0.3);
+        }
+        
+        .metric-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+        
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .metric-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Sentiment Gauge */
+        .sentiment-gauge {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .gauge-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+        }
+        
+        .gauge-circle {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(
+                from 0deg,
+                var(--danger-color) 0deg 120deg,
+                var(--warning-color) 120deg 240deg,
+                var(--success-color) 240deg 360deg
+            );
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .gauge-circle::before {
+            content: '';
+            position: absolute;
+            width: 80%;
+            height: 80%;
+            background: var(--card-bg);
+            border-radius: 50%;
+            z-index: 1;
+        }
+        
+        .gauge-text {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+        
+        .gauge-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--text-color);
+            margin-bottom: 5px;
+        }
+        
+        .gauge-label {
+            font-size: 1rem;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+        
+        /* Sentiment Bars */
+        .sentiment-bars {
+            padding: 20px;
+        }
+        
+        .sentiment-bar-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+        
+        .sentiment-bar-label {
+            min-width: 80px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        
+        .sentiment-bar-container {
+            flex: 1;
+            height: 20px;
+            background: var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .sentiment-bar {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.8s ease;
+            position: relative;
+        }
+        
+        .sentiment-bar.positive {
+            background: linear-gradient(90deg, var(--success-color), #20c997);
+        }
+        
+        .sentiment-bar.neutral {
+            background: linear-gradient(90deg, var(--info-color), #17a2b8);
+        }
+        
+        .sentiment-bar.negative {
+            background: linear-gradient(90deg, var(--danger-color), #dc3545);
+        }
+        
+        .sentiment-bar-value {
+            min-width: 50px;
+            text-align: right;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        
+        /* Emotion Analysis */
+        .emotion-chart {
+            padding: 15px;
+        }
+        
+        .emotion-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 12px;
+        }
+        
+        .emotion-label {
+            min-width: 120px;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+        
+        .emotion-bar-container {
+            flex: 1;
+            height: 18px;
+            background: var(--border-color);
+            border-radius: 9px;
+            overflow: hidden;
+        }
+        
+        .emotion-bar {
+            height: 100%;
+            border-radius: 9px;
+            transition: width 0.6s ease;
+        }
+        
+        .emotion-bar.joy { background: linear-gradient(90deg, #ffd700, #ffed4e); }
+        .emotion-bar.sadness { background: linear-gradient(90deg, #4a90e2, #357abd); }
+        .emotion-bar.anger { background: linear-gradient(90deg, #ff6b6b, #ee5a52); }
+        .emotion-bar.fear { background: linear-gradient(90deg, #9b59b6, #8e44ad); }
+        .emotion-bar.surprise { background: linear-gradient(90deg, #ff9f43, #feca57); }
+        .emotion-bar.disgust { background: linear-gradient(90deg, #6c5ce7, #a29bfe); }
+        .emotion-bar.neutral { background: linear-gradient(90deg, #95a5a6, #7f8c8d); }
+        .emotion-bar.confusion { background: linear-gradient(90deg, #e17055, #d63031); }
+        
+        .emotion-value {
+            min-width: 45px;
+            text-align: right;
+            font-weight: 600;
+            color: var(--text-color);
+            font-size: 0.9rem;
+        }
+        
+        /* Keywords & Topics */
+        .keywords-display {
+            padding: 15px;
+        }
+        
+        .keyword-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .keyword-tag {
+            display: inline-block;
+            background: linear-gradient(45deg, var(--primary-color), var(--info-color));
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .keyword-tag:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+        }
+        
+        .keyword-tag.trending {
+            background: linear-gradient(45deg, var(--warning-color), #ffc107);
+            color: var(--dark-color);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .topic-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 12px;
+        }
+        
+        .topic-label {
+            min-width: 80px;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+        
+        .topic-bar-container {
+            flex: 1;
+            height: 16px;
+            background: var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .topic-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 8px;
+            transition: width 0.5s ease;
+        }
+        
+        .topic-count {
+            min-width: 30px;
+            text-align: right;
+            font-weight: 600;
+            color: var(--text-color);
+            font-size: 0.9rem;
+        }
+        
+        /* Live Insights */
+        .insights-display {
+            padding: 15px;
+        }
+        
+        .insight-alerts {
+            margin-bottom: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .insight-alert {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding: 12px;
+            border-radius: 8px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .insight-text {
+            flex: 1;
+            font-weight: 500;
+        }
+        
+        .insight-time {
+            opacity: 0.7;
+            font-size: 0.8rem;
+        }
+        
+        .conversation-summary {
+            background: var(--hover-bg);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .summary-item {
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+        
+        .summary-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        /* Form switches */
+        .form-check-input:checked {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+        }
+        
+        .form-check-label {
+            font-weight: 500;
+            color: var(--text-color);
+            cursor: pointer;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .call-controls .btn {
+                min-width: 100px;
+                margin: 3px;
+                padding: 8px 15px;
+                font-size: 0.9rem;
+            }
+            
+            .call-info .row {
+                text-align: center;
+            }
+            
+            .call-info .col-md-6 {
+                margin-bottom: 15px;
+            }
+            
+            .transcript-controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .metric-card {
+                margin-bottom: 10px;
+            }
+            
+            .metric-value {
+                font-size: 2rem;
+            }
+            
+            .gauge-container {
+                width: 150px;
+                height: 150px;
+            }
+            
+            .gauge-value {
+                font-size: 1.5rem;
+            }
+            
+            .sentiment-bar-item,
+            .emotion-item,
+            .topic-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .sentiment-bar-container,
+            .emotion-bar-container,
+            .topic-bar-container {
+                width: 100%;
+            }
+            
+            .dashboard-section {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Theme Toggle Button -->
+    <div class="theme-toggle" id="themeToggle">
+        <i class="fas fa-sun" id="themeIcon"></i>
+    </div>
+    
+    <div class="container py-5">
+        <div class="main-container p-4">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <h1 class="display-4 text-primary mb-3">
+                    <i class="fas fa-microphone-alt"></i> Vocalytics
+                </h1>
+                <p class="lead text-muted">Upload your audio files and get comprehensive AI-powered analysis including transcription, sentiment, emotions, and insights</p>
+            </div>
+            
+            <!-- Upload Section -->
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <h4 class="mb-3">Drop your audio file here or click to browse</h4>
+                        <p class="text-muted mb-4">Supports: MP3, WAV, MP4, M4A, FLAC, OGG, AAC, WMA, 3GP, AMR, AIFF</p>
+                        <input type="file" id="audioFile" accept="audio/*" style="display: none;">
+                        <div class="d-flex justify-content-center gap-3 flex-wrap">
+                            <button class="btn btn-primary btn-lg" onclick="document.getElementById('audioFile').click()">
+                                <i class="fas fa-folder-open"></i> Choose File
+                            </button>
+                            <button class="btn btn-success btn-lg" id="startCallBtn">
+                                <i class="fas fa-phone"></i> Start Call
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- File Info -->
+                    <div id="fileInfo" class="file-info" style="display: none;">
+                        <h5><i class="fas fa-file-audio"></i> File Information</h5>
+                        <div id="fileDetails"></div>
+                    </div>
+                    
+                    <!-- Progress -->
+                    <div class="progress-container" style="display: none;" id="progressContainer">
+                        <div class="progress mb-3">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                 role="progressbar" id="progressBar" style="width: 0%"></div>
+                        </div>
+                        <div class="text-center">
+                            <span id="progressText">Uploading...</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="text-center mt-4" id="actionButtons" style="display: none;">
+                        <button class="btn btn-success btn-lg me-3" id="transcribeBtn">
+                            <i class="fas fa-play"></i> Transcribe Audio
+                        </button>
+                        <button class="btn btn-info btn-lg" id="analyzeBtn" disabled>
+                            <i class="fas fa-brain"></i> Analyze Text
+                        </button>
+                    </div>
+                    
+                    <!-- Call Status Section -->
+                    <div class="call-status-section" id="callStatusSection" style="display: none;">
+                        <div class="analysis-card">
+                            <h5><i class="fas fa-phone"></i> Call Status</h5>
+                            <div class="call-info mb-3">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Phone Number:</strong> <span id="callPhoneNumber">-</span></p>
+                                        <p><strong>Status:</strong> <span id="callStatus" class="badge bg-secondary">Idle</span></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Duration:</strong> <span id="callDuration">00:00</span></p>
+                                        <p><strong>Call ID:</strong> <span id="callId">-</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="call-controls text-center">
+                                <button class="btn btn-danger me-2" id="endCallBtn" disabled>
+                                    <i class="fas fa-phone-slash"></i> End Call
+                                </button>
+                                <button class="btn btn-warning me-2" id="muteCallBtn" disabled>
+                                    <i class="fas fa-microphone-slash"></i> Mute
+                                </button>
+                                <button class="btn btn-info" id="recordCallBtn" disabled>
+                                    <i class="fas fa-record-vinyl"></i> Record
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Live Transcription -->
+                        <div class="analysis-card" id="liveTranscriptionCard" style="display: none;">
+                            <h5><i class="fas fa-microphone"></i> Live Transcription</h5>
+                            <div class="live-transcript" id="liveTranscript">
+                                <p class="text-muted">Transcription will appear here when the call starts...</p>
+                            </div>
+                            <div class="transcript-controls mt-3">
+                                <button class="btn btn-sm btn-outline-primary" id="clearTranscriptBtn">
+                                    <i class="fas fa-eraser"></i> Clear
+                                </button>
+                                <button class="btn btn-sm btn-outline-success" id="downloadTranscriptBtn">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Real-time Dashboard -->
+                        <div class="analysis-card" id="realTimeDashboard" style="display: none;">
+                            <h5><i class="fas fa-chart-line"></i> Real-time Analysis Dashboard</h5>
+                            
+                            <!-- Dashboard Controls -->
+                            <div class="dashboard-controls mb-3">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="enableLiveSentiment" checked>
+                                            <label class="form-check-label" for="enableLiveSentiment">
+                                                <i class="fas fa-smile"></i> Live Sentiment
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="enableLiveEmotion" checked>
+                                            <label class="form-check-label" for="enableLiveEmotion">
+                                                <i class="fas fa-heart"></i> Live Emotions
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Live Metrics Row -->
+                            <div class="row mb-4">
+                                <div class="col-md-3">
+                                    <div class="metric-card">
+                                        <div class="metric-icon">
+                                            <i class="fas fa-clock"></i>
+                                        </div>
+                                        <div class="metric-value" id="liveCallDuration">00:00</div>
+                                        <div class="metric-label">Duration</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="metric-card">
+                                        <div class="metric-icon">
+                                            <i class="fas fa-comments"></i>
+                                        </div>
+                                        <div class="metric-value" id="liveWordCount">0</div>
+                                        <div class="metric-label">Words Spoken</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="metric-card">
+                                        <div class="metric-icon">
+                                            <i class="fas fa-users"></i>
+                                        </div>
+                                        <div class="metric-value" id="liveSpeakerCount">0</div>
+                                        <div class="metric-label">Speakers</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="metric-card">
+                                        <div class="metric-icon">
+                                            <i class="fas fa-tachometer-alt"></i>
+                                        </div>
+                                        <div class="metric-value" id="liveSpeechRate">0</div>
+                                        <div class="metric-label">WPM</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Live Sentiment Analysis -->
+                            <div class="dashboard-section" id="liveSentimentSection">
+                                <h6><i class="fas fa-smile"></i> Live Sentiment Analysis</h6>
+                                <div class="sentiment-display">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="sentiment-gauge">
+                                                <div class="gauge-container">
+                                                    <div class="gauge-circle" id="sentimentGauge">
+                                                        <div class="gauge-fill" id="sentimentGaugeFill"></div>
+                                                        <div class="gauge-text">
+                                                            <div class="gauge-value" id="sentimentValue">0%</div>
+                                                            <div class="gauge-label" id="sentimentLabel">Neutral</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="sentiment-bars">
+                                                <div class="sentiment-bar-item">
+                                                    <span class="sentiment-bar-label">Positive</span>
+                                                    <div class="sentiment-bar-container">
+                                                        <div class="sentiment-bar positive" id="positiveBar" style="width: 0%"></div>
+                                                    </div>
+                                                    <span class="sentiment-bar-value" id="positiveValue">0%</span>
+                                                </div>
+                                                <div class="sentiment-bar-item">
+                                                    <span class="sentiment-bar-label">Neutral</span>
+                                                    <div class="sentiment-bar-container">
+                                                        <div class="sentiment-bar neutral" id="neutralBar" style="width: 100%"></div>
+                                                    </div>
+                                                    <span class="sentiment-bar-value" id="neutralValue">100%</span>
+                                                </div>
+                                                <div class="sentiment-bar-item">
+                                                    <span class="sentiment-bar-label">Negative</span>
+                                                    <div class="sentiment-bar-container">
+                                                        <div class="sentiment-bar negative" id="negativeBar" style="width: 0%"></div>
+                                                    </div>
+                                                    <span class="sentiment-bar-value" id="negativeValue">0%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Live Emotion Analysis -->
+                            <div class="dashboard-section" id="liveEmotionSection">
+                                <h6><i class="fas fa-heart"></i> Live Emotion Analysis</h6>
+                                <div class="emotion-display">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="emotion-chart" id="emotionChart">
+                                                <div class="emotion-item">
+                                                    <span class="emotion-label">😊 Joy</span>
+                                                    <div class="emotion-bar-container">
+                                                        <div class="emotion-bar joy" id="joyBar" style="width: 0%"></div>
+                                                    </div>
+                                                    <span class="emotion-value" id="joyValue">0%</span>
+                                                </div>
+                                                <div class="emotion-item">
+                                                    <span class="emotion-label">😢 Sadness</span>
+                                                    <div class="emotion-bar-container">
+                                                        <div class="emotion-bar sadness" id="sadnessBar" style="width: 0%"></div>
+                                                    </div>
+                                                    <span class="emotion-value" id="sadnessValue">0%</span>
+                                                </div>
+                                                <div class="emotion-item">
+                                                    <span class="emotion-label">😠 Anger</span>
+                                                    <div class="emotion-bar-container">
+                                                        <div class="emotion-bar anger" id="angerBar" style="width: 0%"></div>
+                                                    </div>
+                                                    <span class="emotion-value" id="angerValue">0%</span>
+                                                </div>
+                                                <div class="emotion-item">
+                                                    <span class="emotion-label">😨 Fear</span>
+                                                    <div class="emotion-bar-container">
+                                                        <div class="emotion-bar fear" id="fearBar" style="width: 0%"></div>
+                                                    </div>
+                                                    <span class="emotion-value" id="fearValue">0%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="emotion-chart">
+                                                <div class="emotion-item">
+                                                    <span class="emotion-label">😮 Surprise</span>
+                                                    <div class="emotion-bar-container">
+                                                        <div class="emotion-bar surprise" id="surpriseBar" style="width: 0%"></div>
+                                                    </div>
+                                                    <span class="emotion-value" id="surpriseValue">0%</span>
+                                                </div>
+                                                <div class="emotion-item">
+                                                    <span class="emotion-label">🤢 Disgust</span>
+                                                    <div class="emotion-bar-container">
+                                                        <div class="emotion-bar disgust" id="disgustBar" style="width: 0%"></div>
+                                                    </div>
+                                                    <span class="emotion-value" id="disgustValue">0%</span>
+                                                </div>
+                                                <div class="emotion-item">
+                                                    <span class="emotion-label">😐 Neutral</span>
+                                                    <div class="emotion-bar-container">
+                                                        <div class="emotion-bar neutral" id="emotionNeutralBar" style="width: 100%"></div>
+                                                    </div>
+                                                    <span class="emotion-value" id="emotionNeutralValue">100%</span>
+                                                </div>
+                                                <div class="emotion-item">
+                                                    <span class="emotion-label">🤔 Confusion</span>
+                                                    <div class="emotion-bar-container">
+                                                        <div class="emotion-bar confusion" id="confusionBar" style="width: 0%"></div>
+                                                    </div>
+                                                    <span class="emotion-value" id="confusionValue">0%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Live Keywords & Topics -->
+                            <div class="dashboard-section" id="liveKeywordsSection">
+                                <h6><i class="fas fa-tags"></i> Live Keywords & Topics</h6>
+                                <div class="keywords-display">
+                                    <div class="trending-keywords" id="trendingKeywords">
+                                        <div class="keyword-cloud">
+                                            <span class="keyword-tag trending">conversation</span>
+                                            <span class="keyword-tag">analysis</span>
+                                            <span class="keyword-tag">real-time</span>
+                                        </div>
+                                    </div>
+                                    <div class="topic-frequency mt-3">
+                                        <div class="topic-item">
+                                            <span class="topic-label">Business</span>
+                                            <div class="topic-bar-container">
+                                                <div class="topic-bar" id="businessTopicBar" style="width: 0%"></div>
+                                            </div>
+                                            <span class="topic-count" id="businessTopicCount">0</span>
+                                        </div>
+                                        <div class="topic-item">
+                                            <span class="topic-label">Technical</span>
+                                            <div class="topic-bar-container">
+                                                <div class="topic-bar" id="technicalTopicBar" style="width: 0%"></div>
+                                            </div>
+                                            <span class="topic-count" id="technicalTopicCount">0</span>
+                                        </div>
+                                        <div class="topic-item">
+                                            <span class="topic-label">Personal</span>
+                                            <div class="topic-bar-container">
+                                                <div class="topic-bar" id="personalTopicBar" style="width: 0%"></div>
+                                            </div>
+                                            <span class="topic-count" id="personalTopicCount">0</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Live Insights -->
+                            <div class="dashboard-section" id="liveInsightsSection">
+                                <h6><i class="fas fa-lightbulb"></i> Live Insights</h6>
+                                <div class="insights-display">
+                                    <div class="insight-alerts" id="insightAlerts">
+                                        <div class="alert alert-info insight-alert" style="display: none;">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span class="insight-text">Conversation analysis started</span>
+                                            <small class="insight-time">Just now</small>
+                                        </div>
+                                    </div>
+                                    <div class="conversation-summary" id="conversationSummary">
+                                        <div class="summary-item">
+                                            <strong>Conversation Tone:</strong> <span id="conversationTone">Neutral</span>
+                                        </div>
+                                        <div class="summary-item">
+                                            <strong>Engagement Level:</strong> <span id="engagementLevel">Moderate</span>
+                                        </div>
+                                        <div class="summary-item">
+                                            <strong>Key Topics:</strong> <span id="keyTopicsSummary">None detected</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Loading Spinner -->
+            <div class="loading-spinner" id="loadingSpinner">
+                <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-3" id="loadingText">Processing your audio...</p>
+            </div>
+            
+            <!-- Results Section -->
+            <div class="analysis-section" id="resultsSection" style="display: none;">
+                <!-- Transcription Results -->
+                <div class="analysis-card" id="transcriptionCard" style="display: none;">
+                    <h3 class="section-title">
+                        <i class="fas fa-file-alt"></i> Transcription Results
+                    </h3>
+                    <div class="audio-controls">
+                        <audio id="audioPlayer" controls style="width: 100%;">
+                            Your browser does not support the audio element.
+                        </audio>
+                    </div>
+                    <div class="transcription-text" id="transcriptionText"></div>
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            <i class="fas fa-language"></i> Detected Language: <span id="detectedLanguage"></span>
+                        </small>
+                    </div>
+                </div>
+                
+                <!-- Analysis Results -->
+                <div class="analysis-card" id="analysisCard" style="display: none;">
+                    <h3 class="section-title">
+                        <i class="fas fa-chart-line"></i> AI Analysis Results
+                    </h3>
+                    
+                    <!-- Text Statistics -->
+                    <div class="mb-4">
+                        <h5><i class="fas fa-calculator"></i> Text Statistics</h5>
+                        <div class="stats-grid" id="statsGrid"></div>
+                    </div>
+                    
+                    <!-- Sentiment Analysis -->
+                    <div class="mb-4">
+                        <h5><i class="fas fa-smile"></i> Sentiment Analysis</h5>
+                        <div id="sentimentResults"></div>
+                    </div>
+                    
+                    <!-- Emotion Analysis -->
+                    <div class="mb-4">
+                        <h5><i class="fas fa-heart"></i> Emotion Analysis</h5>
+                        <div id="emotionResults"></div>
+                    </div>
+                    
+                    <!-- Key Topics -->
+                    <div class="mb-4">
+                        <h5><i class="fas fa-tags"></i> Key Topics & Keywords</h5>
+                        <div id="topicsResults"></div>
+                    </div>
+                    
+                    <!-- Summary -->
+                    <div class="mb-4">
+                        <h5><i class="fas fa-compress-alt"></i> Summary</h5>
+                        <div class="transcription-text" id="summaryText"></div>
+                    </div>
+                    
+                    <!-- Insights -->
+                    <div class="mb-4">
+                        <h5><i class="fas fa-lightbulb"></i> Insights</h5>
+                        <div id="insightsResults"></div>
+                    </div>
+                    
+                    <!-- Suggestions -->
+                    <div class="mb-4">
+                        <h5><i class="fas fa-magic"></i> Suggestions</h5>
+                        <div id="suggestionsResults"></div>
+                    </div>
+                    
+                    <!-- Download Section -->
+                    <div class="mb-4" id="downloadSection" style="display: none;">
+                        <h5><i class="fas fa-download"></i> Download Report</h5>
+                        <div class="download-buttons">
+                            <button class="btn btn-outline-primary me-2" id="downloadJsonBtn">
+                                <i class="fas fa-file-code"></i> Download JSON
+                            </button>
+                            <button class="btn btn-outline-success me-2" id="downloadWordBtn">
+                                <i class="fas fa-file-word"></i> Download Word
+                            </button>
+                            <button class="btn btn-outline-info" id="emailReportBtn">
+                                <i class="fas fa-envelope"></i> Email Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Modal -->
+    <div class="modal fade" id="emailModal" tabindex="-1" aria-labelledby="emailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="emailModalLabel">
+                        <i class="fas fa-envelope"></i> Email Report
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="emailForm">
+                        <div class="mb-3">
+                            <label for="recipientEmail" class="form-label">
+                                <i class="fas fa-user"></i> Recipient Email
+                            </label>
+                            <input type="email" class="form-control" id="recipientEmail" 
+                                   placeholder="Enter email address" required>
+                            <div class="invalid-feedback" id="emailFeedback">
+                                Please provide a valid email address.
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="emailSubject" class="form-label">
+                                <i class="fas fa-tag"></i> Subject
+                            </label>
+                            <input type="text" class="form-control" id="emailSubject" 
+                                   value="Vocalytics - Audio Analysis Report" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-info-circle"></i> Report Contents
+                            </label>
+                            <div class="email-preview">
+                                <small class="text-muted">
+                                    This report will include:
+                                    <ul class="mt-2">
+                                        <li>Complete transcription</li>
+                                        <li>Sentiment analysis results</li>
+                                        <li>Emotion analysis breakdown</li>
+                                        <li>Key insights and suggestions</li>
+                                        <li>Text statistics and summary</li>
+                                    </ul>
+                                </small>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary" id="sendEmailBtn">
+                        <i class="fas fa-paper-plane"></i> Send Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call Modal -->
+    <div class="modal fade" id="callModal" tabindex="-1" aria-labelledby="callModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="callModalLabel">
+                        <i class="fas fa-phone"></i> Start Call
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="callForm">
+                        <div class="mb-3">
+                            <label for="phoneNumber" class="form-label">
+                                <i class="fas fa-phone"></i> Phone Number
+                            </label>
+                            <input type="tel" class="form-control" id="phoneNumber" 
+                                   placeholder="Enter phone number (e.g., +1234567890)" required>
+                            <div class="form-text">
+                                Include country code (e.g., +1 for US, +91 for India)
+                            </div>
+                            <div class="invalid-feedback" id="phoneFeedback">
+                                Please provide a valid phone number.
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="callType" class="form-label">
+                                <i class="fas fa-cog"></i> Call Type
+                            </label>
+                            <select class="form-select" id="callType">
+                                <option value="outbound">Outbound Call</option>
+                                <option value="inbound">Inbound Call (Generate Number)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-microphone"></i> Real-time Features
+                            </label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="enableTranscription" checked>
+                                <label class="form-check-label" for="enableTranscription">
+                                    Live Transcription
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="enableAnalysis" checked>
+                                <label class="form-check-label" for="enableAnalysis">
+                                    Real-time Sentiment Analysis
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="enableRecording" checked>
+                                <label class="form-check-label" for="enableRecording">
+                                    Call Recording
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-info-circle"></i> Call Features
+                            </label>
+                            <div class="email-preview">
+                                <small class="text-muted">
+                                    This call will include:
+                                    <ul class="mt-2">
+                                        <li>Real-time speech-to-text transcription</li>
+                                        <li>Live sentiment and emotion analysis</li>
+                                        <li>Speaker identification and diarization</li>
+                                        <li>Call recording and analytics</li>
+                                        <li>Post-call insights and summary</li>
+                                    </ul>
+                                </small>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button type="button" class="btn btn-success" id="initiateCallBtn">
+                        <i class="fas fa-phone"></i> Start Call
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        // Theme Toggle Functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const htmlElement = document.documentElement;
+        
+        // Load saved theme preference or default to light
+        const savedTheme = localStorage.getItem('vocalytics-theme') || 'light';
+        setTheme(savedTheme);
+        
+        // Theme toggle event listener
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            setTheme(newTheme);
+            
+            // Add click animation
+            themeToggle.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                themeToggle.style.transform = 'scale(1)';
+            }, 150);
+        });
+        
+        function setTheme(theme) {
+            htmlElement.setAttribute('data-theme', theme);
+            localStorage.setItem('vocalytics-theme', theme);
+            
+            // Update icon with smooth transition
+            themeIcon.style.transform = 'rotate(180deg)';
+            
+            setTimeout(() => {
+                if (theme === 'dark') {
+                    themeIcon.className = 'fas fa-moon';
+                } else {
+                    themeIcon.className = 'fas fa-sun';
+                }
+                themeIcon.style.transform = 'rotate(0deg)';
+            }, 150);
+        }
+        
+        // Global variables
+        let uploadedFile = null;
+        let currentFilename = null;
+        let transcriptionData = null;
+        let analysisData = null;
+        
+        // File upload handling
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('audioFile');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileDetails = document.getElementById('fileDetails');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const actionButtons = document.getElementById('actionButtons');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const loadingText = document.getElementById('loadingText');
+        const resultsSection = document.getElementById('resultsSection');
+        const transcribeBtn = document.getElementById('transcribeBtn');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        
+        // Drag and drop functionality
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileSelect(files[0]);
+            }
+        });
+        
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+        
+        function handleFileSelect(file) {
+            uploadedFile = file;
+            
+            // Display file info
+            fileDetails.innerHTML = `
+                <p><strong>Name:</strong> ${file.name}</p>
+                <p><strong>Size:</strong> ${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                <p><strong>Type:</strong> ${file.type}</p>
+            `;
+            fileInfo.style.display = 'block';
+            
+            // Upload file
+            uploadFile(file);
+        }
+        
+        function uploadFile(file) {
+            const formData = new FormData();
+            formData.append('audio', file);
+            
+            progressContainer.style.display = 'block';
+            progressText.textContent = 'Uploading...';
+            
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                currentFilename = data.filename;
+                progressBar.style.width = '100%';
+                progressText.textContent = 'Upload complete!';
+                
+                setTimeout(() => {
+                    progressContainer.style.display = 'none';
+                    actionButtons.style.display = 'block';
+                }, 1000);
+            })
+            .catch(error => {
+                alert('Upload failed: ' + error.message);
+                progressContainer.style.display = 'none';
+            });
+        }
+        
+        // Transcription
+        transcribeBtn.addEventListener('click', () => {
+            if (!currentFilename) {
+                alert('Please upload a file first');
+                return;
+            }
+            
+            loadingSpinner.style.display = 'block';
+            loadingText.textContent = 'Transcribing audio...';
+            actionButtons.style.display = 'none';
+            
+            fetch('/transcribe', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    filename: currentFilename
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                transcriptionData = data;
+                displayTranscription(data);
+                
+                loadingSpinner.style.display = 'none';
+                actionButtons.style.display = 'block';
+                analyzeBtn.disabled = false;
+            })
+            .catch(error => {
+                alert('Transcription failed: ' + error.message);
+                loadingSpinner.style.display = 'none';
+                actionButtons.style.display = 'block';
+            });
+        });
+        
+        // Analysis
+        analyzeBtn.addEventListener('click', () => {
+            if (!transcriptionData) {
+                alert('Please transcribe audio first');
+                return;
+            }
+            
+            loadingSpinner.style.display = 'block';
+            loadingText.textContent = 'Analyzing text...';
+            actionButtons.style.display = 'none';
+            
+            fetch('/analyze', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    text: transcriptionData.transcription
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                displayAnalysis(data.analysis);
+                
+                loadingSpinner.style.display = 'none';
+                actionButtons.style.display = 'block';
+            })
+            .catch(error => {
+                alert('Analysis failed: ' + error.message);
+                loadingSpinner.style.display = 'none';
+                actionButtons.style.display = 'block';
+            });
+        });
+        
+        function displayTranscription(data) {
+            const transcriptionCard = document.getElementById('transcriptionCard');
+            const transcriptionText = document.getElementById('transcriptionText');
+            const detectedLanguage = document.getElementById('detectedLanguage');
+            const audioPlayer = document.getElementById('audioPlayer');
+            
+            // Store segments data for synchronization
+            window.transcriptionSegments = data.segments || [];
+            
+            // Create interactive transcription with segments
+            if (data.segments && data.segments.length > 0) {
+                let transcriptionHTML = '';
+                data.segments.forEach((segment, index) => {
+                    const startTime = formatTime(segment.start);
+                    const endTime = formatTime(segment.end);
+                    
+                    transcriptionHTML += `
+                        <div class="transcription-segment" 
+                             data-start="${segment.start}" 
+                             data-end="${segment.end}" 
+                             data-index="${index}"
+                             onclick="seekToSegment(${segment.start})">
+                            <span class="segment-timestamp">[${startTime} - ${endTime}]</span>
+                            <span class="segment-text">${segment.text}</span>
+                        </div>
+                    `;
+                });
+                transcriptionText.innerHTML = transcriptionHTML;
+            } else {
+                transcriptionText.textContent = data.transcription;
+            }
+            
+            detectedLanguage.textContent = data.language || 'Unknown';
+            
+            // Set audio source if available
+            if (uploadedFile) {
+                const audioURL = URL.createObjectURL(uploadedFile);
+                audioPlayer.src = audioURL;
+                
+                // Add audio event listeners for synchronization
+                setupAudioSynchronization(audioPlayer);
+            }
+            
+            transcriptionCard.style.display = 'block';
+            resultsSection.style.display = 'block';
+        }
+        
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60);
+            return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+        
+        function seekToSegment(startTime) {
+            const audioPlayer = document.getElementById('audioPlayer');
+            audioPlayer.currentTime = startTime;
+            audioPlayer.play();
+        }
+        
+        function setupAudioSynchronization(audioPlayer) {
+            // Update active segment based on current playback time
+            audioPlayer.addEventListener('timeupdate', () => {
+                const currentTime = audioPlayer.currentTime;
+                updateActiveSegment(currentTime);
+            });
+            
+            // Reset segments when audio ends
+            audioPlayer.addEventListener('ended', () => {
+                clearActiveSegments();
+            });
+            
+            // Reset segments when seeking
+            audioPlayer.addEventListener('seeked', () => {
+                const currentTime = audioPlayer.currentTime;
+                updateActiveSegment(currentTime);
+            });
+        }
+        
+        function updateActiveSegment(currentTime) {
+            const segments = document.querySelectorAll('.transcription-segment');
+            
+            segments.forEach(segment => {
+                const startTime = parseFloat(segment.dataset.start);
+                const endTime = parseFloat(segment.dataset.end);
+                
+                // Remove previous states
+                segment.classList.remove('active', 'playing');
+                
+                // Check if current time is within segment
+                if (currentTime >= startTime && currentTime <= endTime) {
+                    segment.classList.add('playing');
+                    
+                    // Scroll segment into view
+                    segment.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'center' 
+                    });
+                    
+                    // Highlight words if available
+                    highlightCurrentWords(segment, currentTime, startTime, endTime);
+                } else if (currentTime > endTime) {
+                    segment.classList.add('active');
+                }
+            });
+        }
+        
+        function highlightCurrentWords(segment, currentTime, segmentStart, segmentEnd) {
+            const segmentIndex = parseInt(segment.dataset.index);
+            const segmentData = window.transcriptionSegments[segmentIndex];
+            
+            if (segmentData && segmentData.words && segmentData.words.length > 0) {
+                const segmentText = segment.querySelector('.segment-text');
+                let highlightedHTML = '';
+                
+                segmentData.words.forEach(word => {
+                    const wordStart = word.start;
+                    const wordEnd = word.end;
+                    
+                    if (currentTime >= wordStart && currentTime <= wordEnd) {
+                        highlightedHTML += `<span class="word-highlight">${word.word}</span>`;
+                    } else {
+                        highlightedHTML += word.word;
+                    }
+                });
+                
+                segmentText.innerHTML = highlightedHTML;
+            }
+        }
+        
+        function clearActiveSegments() {
+            const segments = document.querySelectorAll('.transcription-segment');
+            segments.forEach(segment => {
+                segment.classList.remove('active', 'playing');
+                
+                // Reset word highlighting
+                const segmentText = segment.querySelector('.segment-text');
+                if (segmentText) {
+                    segmentText.innerHTML = segmentText.textContent;
+                }
+            });
+        }
+        
+        function displayAnalysis(analysis) {
+            // Store analysis data globally and in sessionStorage
+            storeAnalysisData(analysis, transcriptionData);
+            
+            displayStatistics(analysis.statistics);
+            displaySentiment(analysis.sentiment_analysis);
+            displayEmotions(analysis.emotion_analysis);
+            displayTopics(analysis.key_topics);
+            displaySummary(analysis.summary);
+            displayInsights(analysis.insights);
+            displaySuggestions(analysis.suggestions);
+            
+            // Show download section
+            document.getElementById('downloadSection').style.display = 'block';
+            document.getElementById('analysisCard').style.display = 'block';
+        }
+        
+        function displayStatistics(stats) {
+            const statsGrid = document.getElementById('statsGrid');
+            statsGrid.innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-number">${stats.word_count}</div>
+                    <div class="stat-label">Words</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${stats.sentence_count}</div>
+                    <div class="stat-label">Sentences</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${stats.avg_sentence_length}</div>
+                    <div class="stat-label">Avg Sentence Length</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${stats.reading_time_minutes}</div>
+                    <div class="stat-label">Reading Time (min)</div>
+                </div>
+            `;
+        }
+        
+        function displaySentiment(sentiment) {
+            const sentimentResults = document.getElementById('sentimentResults');
+            const sentimentClass = sentiment.sentiment.toLowerCase();
+            
+            sentimentResults.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Overall Sentiment</h6>
+                        <p class="sentiment-${sentimentClass} h4">
+                            <i class="fas fa-${sentimentClass === 'positive' ? 'smile' : sentimentClass === 'negative' ? 'frown' : 'meh'}"></i>
+                            ${sentiment.sentiment}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Metrics</h6>
+                        <p><strong>Polarity:</strong> ${sentiment.polarity}</p>
+                        <p><strong>Subjectivity:</strong> ${sentiment.subjectivity}</p>
+                        <p><strong>Confidence:</strong> ${sentiment.confidence}</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function displayEmotions(emotions) {
+            const emotionResults = document.getElementById('emotionResults');
+            const emotionColors = {
+                joy: '#28a745',
+                sadness: '#007bff',
+                anger: '#dc3545',
+                fear: '#6f42c1',
+                surprise: '#fd7e14',
+                disgust: '#20c997'
+            };
+            
+            let emotionBars = '';
+            for (const [emotion, score] of Object.entries(emotions.emotion_scores)) {
+                emotionBars += `
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between">
+                            <span>${emotion.charAt(0).toUpperCase() + emotion.slice(1)}</span>
+                            <span>${score}%</span>
+                        </div>
+                        <div class="emotion-bar" style="background-color: ${emotionColors[emotion]}; width: ${score}%"></div>
+                    </div>
+                `;
+            }
+            
+            emotionResults.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Dominant Emotion</h6>
+                        <p class="h4">${emotions.dominant_emotion.charAt(0).toUpperCase() + emotions.dominant_emotion.slice(1)}</p>
+                        <p><strong>Intensity:</strong> ${emotions.emotional_intensity}%</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Emotion Breakdown</h6>
+                        ${emotionBars}
+                    </div>
+                </div>
+            `;
+        }
+        
+        function displayTopics(topics) {
+            const topicsResults = document.getElementById('topicsResults');
+            
+            let topicsList = '';
+            if (topics.topics && topics.topics.length > 0) {
+                topicsList = '<h6>Main Topics:</h6>';
+                topics.topics.forEach(topic => {
+                    topicsList += `<span class="keyword-tag">${topic.topic} (${topic.relevance})</span>`;
+                });
+            }
+            
+            let keywordsList = '';
+            if (topics.keywords && topics.keywords.length > 0) {
+                keywordsList = '<h6 class="mt-3">Top Keywords:</h6>';
+                topics.keywords.forEach(keyword => {
+                    keywordsList += `<span class="keyword-tag">${keyword.keyword} (${keyword.frequency})</span>`;
+                });
+            }
+            
+            topicsResults.innerHTML = topicsList + keywordsList;
+        }
+        
+        function displaySummary(summary) {
+            document.getElementById('summaryText').textContent = summary;
+        }
+        
+        function displayInsights(insights) {
+            const insightsResults = document.getElementById('insightsResults');
+            let insightsHTML = '';
+            
+            insights.forEach(insight => {
+                insightsHTML += `<div class="insight-item">${insight}</div>`;
+            });
+            
+            insightsResults.innerHTML = insightsHTML;
+        }
+        
+        function displaySuggestions(suggestions) {
+            const suggestionsResults = document.getElementById('suggestionsResults');
+            let suggestionsHTML = '';
+            
+            suggestions.forEach(suggestion => {
+                suggestionsHTML += `<div class="suggestion-item">${suggestion}</div>`;
+            });
+            
+            suggestionsResults.innerHTML = suggestionsHTML;
+        }
+        
+        // Download Functions
+        function downloadJSON() {
+            if (!analysisData || !transcriptionData) {
+                alert('Please complete the analysis first before downloading.');
+                return;
+            }
+            
+            const reportData = {
+                transcription: transcriptionData.transcription,
+                language: transcriptionData.language,
+                sentiment: analysisData.sentiment_analysis,
+                emotions: analysisData.emotion_analysis,
+                topics: analysisData.key_topics,
+                statistics: analysisData.statistics,
+                summary: analysisData.summary,
+                insights: analysisData.insights,
+                suggestions: analysisData.suggestions
+            };
+            
+            // Show loading state
+            const downloadBtn = document.getElementById('downloadJsonBtn');
+            const originalText = downloadBtn.innerHTML;
+            downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+            downloadBtn.disabled = true;
+            
+            fetch('/download/json', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    report_data: reportData
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                // Create and trigger download
+                const blob = new Blob([data.content], { type: data.mime_type });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = data.filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                
+                // Show success message
+                showNotification('JSON report downloaded successfully!', 'success');
+            })
+            .catch(error => {
+                console.error('JSON download error:', error);
+                showNotification('Failed to download JSON report: ' + error.message, 'error');
+            })
+            .finally(() => {
+                // Reset button
+                downloadBtn.innerHTML = originalText;
+                downloadBtn.disabled = false;
+            });
+        }
+        
+        function downloadWord() {
+            if (!analysisData || !transcriptionData) {
+                alert('Please complete the analysis first before downloading.');
+                return;
+            }
+            
+            const reportData = {
+                transcription: transcriptionData.transcription,
+                language: transcriptionData.language,
+                sentiment: analysisData.sentiment_analysis,
+                emotions: analysisData.emotion_analysis,
+                topics: analysisData.key_topics,
+                statistics: analysisData.statistics,
+                summary: analysisData.summary,
+                insights: analysisData.insights,
+                suggestions: analysisData.suggestions
+            };
+            
+            // Show loading state
+            const downloadBtn = document.getElementById('downloadWordBtn');
+            const originalText = downloadBtn.innerHTML;
+            downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+            downloadBtn.disabled = true;
+            
+            fetch('/download/word', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    report_data: reportData
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                // Convert base64 to blob and trigger download
+                const binaryString = atob(data.content);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                
+                const blob = new Blob([bytes], { type: data.mime_type });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = data.filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                
+                // Show success message
+                showNotification('Word report downloaded successfully!', 'success');
+            })
+            .catch(error => {
+                console.error('Word download error:', error);
+                showNotification('Failed to download Word report: ' + error.message, 'error');
+            })
+            .finally(() => {
+                // Reset button
+                downloadBtn.innerHTML = originalText;
+                downloadBtn.disabled = false;
+            });
+        }
+        
+        // Email sending functionality
+        function openEmailModal() {
+            if (!analysisData || !transcriptionData) {
+                alert('Please complete the analysis first before sending email.');
+                return;
+            }
+            
+            // Show the email modal
+            const emailModal = new bootstrap.Modal(document.getElementById('emailModal'));
+            emailModal.show();
+        }
+        
+        function sendEmail() {
+            const emailInput = document.getElementById('recipientEmail');
+            const emailAddress = emailInput.value.trim();
+            
+            // Validate email address
+            if (!emailAddress) {
+                showNotification('Please enter an email address.', 'error');
+                return;
+            }
+            
+            if (!isValidEmail(emailAddress)) {
+                showNotification('Please enter a valid email address.', 'error');
+                return;
+            }
+            
+            if (!analysisData || !transcriptionData) {
+                showNotification('Please complete the analysis first before sending email.', 'error');
+                return;
+            }
+            
+            const reportData = {
+                transcription: transcriptionData.transcription,
+                language: transcriptionData.language,
+                sentiment: analysisData.sentiment_analysis,
+                emotions: analysisData.emotion_analysis,
+                topics: analysisData.key_topics,
+                statistics: analysisData.statistics,
+                summary: analysisData.summary,
+                insights: analysisData.insights,
+                suggestions: analysisData.suggestions
+            };
+            
+            // Show loading state
+            const sendBtn = document.getElementById('sendEmailBtn');
+            const originalText = sendBtn.innerHTML;
+            sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            sendBtn.disabled = true;
+            
+            fetch('/send-email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: emailAddress,
+                    report_data: reportData
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                // Show success message
+                showNotification('Email sent successfully!', 'success');
+                
+                // Close modal and reset form
+                const emailModal = bootstrap.Modal.getInstance(document.getElementById('emailModal'));
+                emailModal.hide();
+                emailInput.value = '';
+            })
+            .catch(error => {
+                console.error('Email sending error:', error);
+                showNotification('Failed to send email: ' + error.message, 'error');
+            })
+            .finally(() => {
+                // Reset button
+                sendBtn.innerHTML = originalText;
+                sendBtn.disabled = false;
+            });
+        }
+        
+        // Email validation function
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+        
+        // Real-time email validation
+        function validateEmailInput() {
+            const emailInput = document.getElementById('recipientEmail');
+            const emailFeedback = document.getElementById('emailFeedback');
+            const sendBtn = document.getElementById('sendEmailBtn');
+            const email = emailInput.value.trim();
+            
+            if (email === '') {
+                emailInput.classList.remove('is-valid', 'is-invalid');
+                emailFeedback.textContent = '';
+                sendBtn.disabled = true;
+                return;
+            }
+            
+            if (isValidEmail(email)) {
+                emailInput.classList.remove('is-invalid');
+                emailInput.classList.add('is-valid');
+                emailFeedback.textContent = '';
+                emailFeedback.className = 'valid-feedback';
+                sendBtn.disabled = false;
+            } else {
+                emailInput.classList.remove('is-valid');
+                emailInput.classList.add('is-invalid');
+                emailFeedback.textContent = 'Please enter a valid email address.';
+                emailFeedback.className = 'invalid-feedback';
+                sendBtn.disabled = true;
+            }
+        }
+        
+        // Handle Enter key in email input
+        function handleEmailKeyPress(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const sendBtn = document.getElementById('sendEmailBtn');
+                if (!sendBtn.disabled) {
+                    sendEmail();
+                }
+            }
+        }
+        
+        // Notification function
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'info'} alert-dismissible fade show`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                z-index: 1050;
+                min-width: 300px;
+                max-width: 400px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                border-radius: 10px;
+            `;
+            
+            notification.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-${type === 'error' ? 'exclamation-triangle' : type === 'success' ? 'check-circle' : 'info-circle'} me-2"></i>
+                    <span>${message}</span>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 5000);
+        }
+        
+
+        
+        // Enhanced Global Data Storage
+        function storeAnalysisData(analysis, transcription) {
+            // Store analysis data globally
+            analysisData = analysis;
+            transcriptionData = transcription;
+            window.analysisData = analysis;
+            window.transcriptionData = transcription;
+            
+            // Store in sessionStorage for persistence across page refreshes
+            try {
+                sessionStorage.setItem('vocalytics-analysis', JSON.stringify(analysis));
+                sessionStorage.setItem('vocalytics-transcription', JSON.stringify(transcription));
+                console.log('Analysis data stored successfully');
+            } catch (error) {
+                console.warn('Failed to store analysis data in sessionStorage:', error);
+            }
+        }
+        
+        function loadStoredAnalysisData() {
+            try {
+                const storedAnalysis = sessionStorage.getItem('vocalytics-analysis');
+                const storedTranscription = sessionStorage.getItem('vocalytics-transcription');
+                
+                if (storedAnalysis && storedTranscription) {
+                    analysisData = JSON.parse(storedAnalysis);
+                    transcriptionData = JSON.parse(storedTranscription);
+                    window.analysisData = analysisData;
+                    window.transcriptionData = transcriptionData;
+                    
+                    // Show download section if data exists
+                    document.getElementById('downloadSection').style.display = 'block';
+                    
+                    console.log('Stored analysis data loaded successfully');
+                    return true;
+                }
+            } catch (error) {
+                console.warn('Failed to load stored analysis data:', error);
+            }
+            return false;
+        }
+        
+        function clearStoredAnalysisData() {
+            try {
+                sessionStorage.removeItem('vocalytics-analysis');
+                sessionStorage.removeItem('vocalytics-transcription');
+                analysisData = null;
+                transcriptionData = null;
+                window.analysisData = null;
+                window.transcriptionData = null;
+                
+                // Hide download section
+                document.getElementById('downloadSection').style.display = 'none';
+                
+                console.log('Stored analysis data cleared');
+            } catch (error) {
+                console.warn('Failed to clear stored analysis data:', error);
+            }
+        }
+        
+        // Call functionality
+        let currentCallId = null;
+        let callTimer = null;
+        let callStartTime = null;
+        let awsTranscribeSocket = null;
+        
+        // Show call modal
+        function showCallModal() {
+            const callModal = new bootstrap.Modal(document.getElementById('callModal'));
+            callModal.show();
+        }
+        
+        // Validate phone number
+        function validatePhoneNumber(phoneNumber) {
+            // Basic phone number validation (international format)
+            const phoneRegex = /^\+[1-9]\d{1,14}$/;
+            return phoneRegex.test(phoneNumber);
+        }
+        
+        // Start call
+        function startCall() {
+            const phoneNumber = document.getElementById('phoneNumber').value.trim();
+            const callType = document.getElementById('callType').value;
+            const enableTranscription = document.getElementById('enableTranscription').checked;
+            const enableAnalysis = document.getElementById('enableAnalysis').checked;
+            const enableRecording = document.getElementById('enableRecording').checked;
+            
+            // Validate phone number
+            if (!phoneNumber) {
+                showNotification('Please enter a phone number.', 'error');
+                return;
+            }
+            
+            if (!validatePhoneNumber(phoneNumber)) {
+                showNotification('Please enter a valid phone number with country code (e.g., +1234567890).', 'error');
+                return;
+            }
+            
+            // Show loading state
+            const initiateBtn = document.getElementById('initiateCallBtn');
+            const originalText = initiateBtn.innerHTML;
+            initiateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
+            initiateBtn.disabled = true;
+            
+            // Prepare call data
+            const callData = {
+                phone_number: phoneNumber,
+                call_type: callType,
+                enable_transcription: enableTranscription,
+                enable_analysis: enableAnalysis,
+                enable_recording: enableRecording
+            };
+            
+            // Make API call to start call
+            fetch('/api/call/start', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(callData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                // Store call ID and update UI
+                currentCallId = data.call_id;
+                updateCallStatus(data);
+                
+                // Close modal
+                const callModal = bootstrap.Modal.getInstance(document.getElementById('callModal'));
+                callModal.hide();
+                
+                // Show call status section
+                document.getElementById('callStatusSection').style.display = 'block';
+                
+                // Start call timer
+                startCallTimer();
+                
+                // Initialize live transcription if enabled
+                if (enableTranscription) {
+                    initializeLiveTranscription(data.call_id);
+                }
+                
+                showNotification('Call started successfully!', 'success');
+            })
+            .catch(error => {
+                console.error('Call start error:', error);
+                showNotification('Failed to start call: ' + error.message, 'error');
+            })
+            .finally(() => {
+                // Reset button
+                initiateBtn.innerHTML = originalText;
+                initiateBtn.disabled = false;
+            });
+        }
+        
+        // Update call status display
+        function updateCallStatus(callData) {
+            document.getElementById('callPhoneNumber').textContent = callData.phone_number || '-';
+            document.getElementById('callId').textContent = callData.call_id || '-';
+            
+            const statusElement = document.getElementById('callStatus');
+            const status = callData.status || 'unknown';
+            
+            // Update status badge
+            statusElement.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+            statusElement.className = 'badge ' + getStatusBadgeClass(status);
+            
+            // Enable/disable controls based on status
+            const isActive = status === 'active' || status === 'in-progress';
+            document.getElementById('endCallBtn').disabled = !isActive;
+            document.getElementById('muteCallBtn').disabled = !isActive;
+            document.getElementById('recordCallBtn').disabled = !isActive;
+        }
+        
+        // Get badge class for status
+        function getStatusBadgeClass(status) {
+            switch (status.toLowerCase()) {
+                case 'active':
+                case 'in-progress':
+                    return 'bg-success';
+                case 'ringing':
+                    return 'bg-warning';
+                case 'ended':
+                case 'completed':
+                    return 'bg-secondary';
+                case 'failed':
+                    return 'bg-danger';
+                default:
+                    return 'bg-info';
+            }
+        }
+        
+        // Start call timer
+        function startCallTimer() {
+            callStartTime = Date.now();
+            callTimer = setInterval(() => {
+                const elapsed = Date.now() - callStartTime;
+                const minutes = Math.floor(elapsed / 60000);
+                const seconds = Math.floor((elapsed % 60000) / 1000);
+                document.getElementById('callDuration').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+        
+        // Stop call timer
+        function stopCallTimer() {
+            if (callTimer) {
+                clearInterval(callTimer);
+                callTimer = null;
+            }
+        }
+        
+        // End call
+        function endCall() {
+            if (!currentCallId) {
+                showNotification('No active call to end.', 'error');
+                return;
+            }
+            
+            const endBtn = document.getElementById('endCallBtn');
+            const originalText = endBtn.innerHTML;
+            endBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Ending...';
+            endBtn.disabled = true;
+            
+            fetch(`/api/call/${currentCallId}/end`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                // Update call status
+                updateCallStatus(data);
+                
+                // Stop timer
+                stopCallTimer();
+                
+                // Close transcription connection
+                if (awsTranscribeSocket) {
+                    awsTranscribeSocket.close();
+                    awsTranscribeSocket = null;
+                }
+                
+                // Reset call ID
+                currentCallId = null;
+                
+                showNotification('Call ended successfully!', 'success');
+            })
+            .catch(error => {
+                console.error('Call end error:', error);
+                showNotification('Failed to end call: ' + error.message, 'error');
+            })
+            .finally(() => {
+                // Reset button
+                endBtn.innerHTML = originalText;
+                endBtn.disabled = false;
+            });
+        }
+        
+        // Initialize live transcription
+        function initializeLiveTranscription(callId) {
+            // Show live transcription card
+            document.getElementById('liveTranscriptionCard').style.display = 'block';
+            
+            // Show real-time dashboard
+            document.getElementById('realTimeDashboard').style.display = 'block';
+            
+            // Initialize dashboard
+            initializeRealTimeDashboard();
+            
+            // Clear existing transcript
+            const transcriptElement = document.getElementById('liveTranscript');
+            transcriptElement.innerHTML = '<p class="text-muted">Connecting to transcription service...</p>';
+            
+            // Connect to AWS Transcribe WebSocket
+            try {
+                awsTranscribeSocket = new WebSocket('ws://localhost:8766');
+                
+                awsTranscribeSocket.onopen = function(event) {
+                    console.log('Connected to AWS Transcribe WebSocket');
+                    transcriptElement.innerHTML = '<p class="text-muted">Transcription started. Speak into your microphone...</p>';
+                    
+                    // Start dashboard updates
+                    startDashboardUpdates();
+                };
+                
+                awsTranscribeSocket.onmessage = function(event) {
+                    const data = JSON.parse(event.data);
+                    if (data.type === 'transcript') {
+                        addTranscriptLine(data.speaker, data.text, data.timestamp, data.is_final);
+                        
+                        // Update dashboard with new data
+                        updateDashboardWithTranscript(data);
+                    } else if (data.type === 'analysis') {
+                        // Update dashboard with analysis results
+                        updateDashboardWithAnalysis(data);
+                    }
+                };
+                
+                awsTranscribeSocket.onclose = function(event) {
+                    console.log('AWS Transcribe WebSocket closed');
+                    transcriptElement.innerHTML += '<p class="text-muted"><em>Transcription ended.</em></p>';
+                    
+                    // Stop dashboard updates
+                    stopDashboardUpdates();
+                };
+                
+                awsTranscribeSocket.onerror = function(error) {
+                    console.error('AWS Transcribe WebSocket error:', error);
+                    transcriptElement.innerHTML = '<p class="text-danger">Transcription error. Please try again.</p>';
+                };
+                
+            } catch (error) {
+                console.error('Failed to initialize live transcription:', error);
+                transcriptElement.innerHTML = '<p class="text-danger">Failed to connect to transcription service.</p>';
+            }
+        }
+        
+        // Add transcript line
+        function addTranscriptLine(speaker, text, timestamp, isFinal) {
+            const transcriptElement = document.getElementById('liveTranscript');
+            
+            // Remove "connecting" or "started" messages
+            const mutedElements = transcriptElement.querySelectorAll('.text-muted');
+            mutedElements.forEach(el => {
+                if (el.textContent.includes('Connecting') || el.textContent.includes('started')) {
+                    el.remove();
+                }
+            });
+            
+            const time = new Date(timestamp).toLocaleTimeString();
+            const lineClass = isFinal ? 'transcript-line' : 'transcript-line opacity-75';
+            
+            const transcriptLine = document.createElement('div');
+            transcriptLine.className = lineClass;
+            transcriptLine.innerHTML = `
+                <span class="speaker-label">${speaker}:</span>
+                <span class="transcript-text">${text}</span>
+                <span class="timestamp">${time}</span>
+            `;
+            
+            transcriptElement.appendChild(transcriptLine);
+            
+            // Auto-scroll to bottom
+            transcriptElement.scrollTop = transcriptElement.scrollHeight;
+        }
+        
+        // Clear transcript
+        function clearTranscript() {
+            const transcriptElement = document.getElementById('liveTranscript');
+            transcriptElement.innerHTML = '<p class="text-muted">Transcript cleared.</p>';
+        }
+        
+        // Download transcript
+        function downloadTranscript() {
+            const transcriptElement = document.getElementById('liveTranscript');
+            const transcriptLines = transcriptElement.querySelectorAll('.transcript-line');
+            
+            if (transcriptLines.length === 0) {
+                showNotification('No transcript available to download.', 'error');
+                return;
+            }
+            
+            let transcriptText = 'Call Transcript\n';
+            transcriptText += '================\n\n';
+            
+            transcriptLines.forEach(line => {
+                const speaker = line.querySelector('.speaker-label').textContent;
+                const text = line.querySelector('.transcript-text').textContent;
+                const timestamp = line.querySelector('.timestamp').textContent;
+                transcriptText += `[${timestamp}] ${speaker} ${text}\n`;
+            });
+            
+            // Create and download file
+            const blob = new Blob([transcriptText], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `call_transcript_${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            showNotification('Transcript downloaded successfully!', 'success');
+        }
+        
+        // Real-time Dashboard Functions
+        let dashboardUpdateInterval = null;
+        let dashboardData = {
+            wordCount: 0,
+            speakerCount: 0,
+            speechRate: 0,
+            sentiment: { positive: 0, neutral: 100, negative: 0 },
+            emotions: {
+                joy: 0, sadness: 0, anger: 0, fear: 0,
+                surprise: 0, disgust: 0, neutral: 100, confusion: 0
+            },
+            keywords: new Map(),
+            topics: { business: 0, technical: 0, personal: 0 },
+            insights: []
+        };
+        
+        // Initialize real-time dashboard
+        function initializeRealTimeDashboard() {
+            console.log('Initializing real-time dashboard...');
+            
+            // Reset dashboard data
+            dashboardData = {
+                wordCount: 0,
+                speakerCount: 0,
+                speechRate: 0,
+                sentiment: { positive: 0, neutral: 100, negative: 0 },
+                emotions: {
+                    joy: 0, sadness: 0, anger: 0, fear: 0,
+                    surprise: 0, disgust: 0, neutral: 100, confusion: 0
+                },
+                keywords: new Map(),
+                topics: { business: 0, technical: 0, personal: 0 },
+                insights: []
+            };
+            
+            // Initialize UI elements
+            updateDashboardUI();
+            
+            // Add initial insight
+            addInsight('Conversation analysis started', 'info');
+        }
+        
+        // Start dashboard updates
+        function startDashboardUpdates() {
+            if (dashboardUpdateInterval) {
+                clearInterval(dashboardUpdateInterval);
+            }
+            
+            dashboardUpdateInterval = setInterval(() => {
+                updateLiveMetrics();
+                updateDashboardUI();
+            }, 1000);
+        }
+        
+        // Stop dashboard updates
+        function stopDashboardUpdates() {
+            if (dashboardUpdateInterval) {
+                clearInterval(dashboardUpdateInterval);
+                dashboardUpdateInterval = null;
+            }
+            
+            addInsight('Conversation analysis completed', 'success');
+        }
+        
+        // Update dashboard with transcript data
+        function updateDashboardWithTranscript(data) {
+            if (!data.text || !data.is_final) return;
+            
+            // Update word count
+            const words = data.text.split(/\s+/).filter(word => word.length > 0);
+            dashboardData.wordCount += words.length;
+            
+            // Update speaker count
+            const speakers = new Set();
+            document.querySelectorAll('.transcript-line .speaker-label').forEach(label => {
+                speakers.add(label.textContent.replace(':', ''));
+            });
+            dashboardData.speakerCount = speakers.size;
+            
+            // Extract and update keywords
+            extractKeywords(data.text);
+            
+            // Update topics (simple keyword-based classification)
+            updateTopics(data.text);
+            
+            // Calculate speech rate
+            const callDuration = getCallDurationInMinutes();
+            if (callDuration > 0) {
+                dashboardData.speechRate = Math.round(dashboardData.wordCount / callDuration);
+            }
+        }
+        
+        // Update dashboard with analysis results
+        function updateDashboardWithAnalysis(data) {
+            if (data.sentiment) {
+                dashboardData.sentiment = {
+                    positive: Math.round(data.sentiment.positive * 100),
+                    neutral: Math.round(data.sentiment.neutral * 100),
+                    negative: Math.round(data.sentiment.negative * 100)
+                };
+                
+                // Add sentiment insight
+                const dominantSentiment = getDominantSentiment(dashboardData.sentiment);
+                if (dominantSentiment !== 'neutral') {
+                    addInsight(`Conversation tone shifted to ${dominantSentiment}`, 
+                              dominantSentiment === 'positive' ? 'success' : 'warning');
+                }
+            }
+            
+            if (data.emotions) {
+                Object.keys(data.emotions).forEach(emotion => {
+                    dashboardData.emotions[emotion] = Math.round(data.emotions[emotion] * 100);
+                });
+                
+                // Add emotion insight
+                const dominantEmotion = getDominantEmotion(dashboardData.emotions);
+                if (dominantEmotion !== 'neutral' && dashboardData.emotions[dominantEmotion] > 50) {
+                    addInsight(`Strong ${dominantEmotion} detected in conversation`, 'info');
+                }
+            }
+        }
+        
+        // Extract keywords from text
+        function extractKeywords(text) {
+            const words = text.toLowerCase()
+                .replace(/[^\w\s]/g, '')
+                .split(/\s+/)
+                .filter(word => word.length > 3);
+            
+            words.forEach(word => {
+                if (dashboardData.keywords.has(word)) {
+                    dashboardData.keywords.set(word, dashboardData.keywords.get(word) + 1);
+                } else {
+                    dashboardData.keywords.set(word, 1);
+                }
+            });
+        }
+        
+        // Update topics based on keywords
+        function updateTopics(text) {
+            const businessKeywords = ['business', 'company', 'sales', 'revenue', 'profit', 'market', 'client', 'customer'];
+            const technicalKeywords = ['technology', 'software', 'system', 'technical', 'development', 'programming', 'data'];
+            const personalKeywords = ['personal', 'family', 'friend', 'feeling', 'emotion', 'relationship', 'life'];
+            
+            const lowerText = text.toLowerCase();
+            
+            businessKeywords.forEach(keyword => {
+                if (lowerText.includes(keyword)) {
+                    dashboardData.topics.business++;
+                }
+            });
+            
+            technicalKeywords.forEach(keyword => {
+                if (lowerText.includes(keyword)) {
+                    dashboardData.topics.technical++;
+                }
+            });
+            
+            personalKeywords.forEach(keyword => {
+                if (lowerText.includes(keyword)) {
+                    dashboardData.topics.personal++;
+                }
+            });
+        }
+        
+        // Get call duration in minutes
+        function getCallDurationInMinutes() {
+            if (!callStartTime) return 0;
+            return (Date.now() - callStartTime) / 60000;
+        }
+        
+        // Get dominant sentiment
+        function getDominantSentiment(sentiment) {
+            const max = Math.max(sentiment.positive, sentiment.neutral, sentiment.negative);
+            if (max === sentiment.positive) return 'positive';
+            if (max === sentiment.negative) return 'negative';
+            return 'neutral';
+        }
+        
+        // Get dominant emotion
+        function getDominantEmotion(emotions) {
+            let maxEmotion = 'neutral';
+            let maxValue = 0;
+            
+            Object.keys(emotions).forEach(emotion => {
+                if (emotions[emotion] > maxValue) {
+                    maxValue = emotions[emotion];
+                    maxEmotion = emotion;
+                }
+            });
+            
+            return maxEmotion;
+        }
+        
+        // Add insight to dashboard
+        function addInsight(text, type = 'info') {
+            const insight = {
+                text: text,
+                type: type,
+                timestamp: new Date()
+            };
+            
+            dashboardData.insights.unshift(insight);
+            
+            // Keep only last 10 insights
+            if (dashboardData.insights.length > 10) {
+                dashboardData.insights = dashboardData.insights.slice(0, 10);
+            }
+            
+            updateInsightsDisplay();
+        }
+        
+        // Update live metrics
+        function updateLiveMetrics() {
+            // Update call duration
+            if (callStartTime) {
+                const elapsed = Date.now() - callStartTime;
+                const minutes = Math.floor(elapsed / 60000);
+                const seconds = Math.floor((elapsed % 60000) / 1000);
+                document.getElementById('liveCallDuration').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+        }
+        
+        // Update dashboard UI
+        function updateDashboardUI() {
+            // Update metrics
+            document.getElementById('liveWordCount').textContent = dashboardData.wordCount;
+            document.getElementById('liveSpeakerCount').textContent = dashboardData.speakerCount;
+            document.getElementById('liveSpeechRate').textContent = dashboardData.speechRate;
+            
+            // Update sentiment
+            updateSentimentDisplay();
+            
+            // Update emotions
+            updateEmotionDisplay();
+            
+            // Update keywords
+            updateKeywordsDisplay();
+            
+            // Update topics
+            updateTopicsDisplay();
+            
+            // Update conversation summary
+            updateConversationSummary();
+        }
+        
+        // Update sentiment display
+        function updateSentimentDisplay() {
+            const sentiment = dashboardData.sentiment;
+            
+            // Update bars
+            document.getElementById('positiveBar').style.width = `${sentiment.positive}%`;
+            document.getElementById('neutralBar').style.width = `${sentiment.neutral}%`;
+            document.getElementById('negativeBar').style.width = `${sentiment.negative}%`;
+            
+            // Update values
+            document.getElementById('positiveValue').textContent = `${sentiment.positive}%`;
+            document.getElementById('neutralValue').textContent = `${sentiment.neutral}%`;
+            document.getElementById('negativeValue').textContent = `${sentiment.negative}%`;
+            
+            // Update gauge
+            const dominantSentiment = getDominantSentiment(sentiment);
+            const dominantValue = sentiment[dominantSentiment];
+            
+            document.getElementById('sentimentValue').textContent = `${dominantValue}%`;
+            document.getElementById('sentimentLabel').textContent = dominantSentiment.charAt(0).toUpperCase() + dominantSentiment.slice(1);
+        }
+        
+        // Update emotion display
+        function updateEmotionDisplay() {
+            const emotions = dashboardData.emotions;
+            
+            Object.keys(emotions).forEach(emotion => {
+                const barElement = document.getElementById(`${emotion}Bar`);
+                const valueElement = document.getElementById(`${emotion}Value`);
+                
+                if (barElement && valueElement) {
+                    barElement.style.width = `${emotions[emotion]}%`;
+                    valueElement.textContent = `${emotions[emotion]}%`;
+                }
+            });
+        }
+        
+        // Update keywords display
+        function updateKeywordsDisplay() {
+            const keywordCloud = document.querySelector('.keyword-cloud');
+            keywordCloud.innerHTML = '';
+            
+            // Sort keywords by frequency
+            const sortedKeywords = Array.from(dashboardData.keywords.entries())
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10);
+            
+            sortedKeywords.forEach(([word, count]) => {
+                const keywordElement = document.createElement('span');
+                keywordElement.className = count > 3 ? 'keyword-tag trending' : 'keyword-tag';
+                keywordElement.textContent = `${word} (${count})`;
+                keywordCloud.appendChild(keywordElement);
+            });
+        }
+        
+        // Update topics display
+        function updateTopicsDisplay() {
+            const topics = dashboardData.topics;
+            const total = Math.max(topics.business + topics.technical + topics.personal, 1);
+            
+            // Update business topic
+            const businessPercent = Math.round((topics.business / total) * 100);
+            document.getElementById('businessTopicBar').style.width = `${businessPercent}%`;
+            document.getElementById('businessTopicCount').textContent = topics.business;
+            
+            // Update technical topic
+            const technicalPercent = Math.round((topics.technical / total) * 100);
+            document.getElementById('technicalTopicBar').style.width = `${technicalPercent}%`;
+            document.getElementById('technicalTopicCount').textContent = topics.technical;
+            
+            // Update personal topic
+            const personalPercent = Math.round((topics.personal / total) * 100);
+            document.getElementById('personalTopicBar').style.width = `${personalPercent}%`;
+            document.getElementById('personalTopicCount').textContent = topics.personal;
+        }
+        
+        // Update insights display
+        function updateInsightsDisplay() {
+            const insightAlerts = document.getElementById('insightAlerts');
+            insightAlerts.innerHTML = '';
+            
+            dashboardData.insights.forEach(insight => {
+                const alertElement = document.createElement('div');
+                alertElement.className = `alert alert-${insight.type === 'success' ? 'success' : insight.type === 'warning' ? 'warning' : 'info'} insight-alert`;
+                
+                const timeAgo = getTimeAgo(insight.timestamp);
+                
+                alertElement.innerHTML = `
+                    <i class="fas fa-${insight.type === 'success' ? 'check-circle' : insight.type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                    <span class="insight-text">${insight.text}</span>
+                    <small class="insight-time">${timeAgo}</small>
+                `;
+                
+                insightAlerts.appendChild(alertElement);
+            });
+        }
+        
+        // Update conversation summary
+        function updateConversationSummary() {
+            const dominantSentiment = getDominantSentiment(dashboardData.sentiment);
+            const dominantEmotion = getDominantEmotion(dashboardData.emotions);
+            
+            document.getElementById('conversationTone').textContent = 
+                dominantSentiment.charAt(0).toUpperCase() + dominantSentiment.slice(1);
+            
+            // Calculate engagement level based on speech rate and word count
+            let engagementLevel = 'Low';
+            if (dashboardData.speechRate > 150 && dashboardData.wordCount > 100) {
+                engagementLevel = 'High';
+            } else if (dashboardData.speechRate > 100 || dashboardData.wordCount > 50) {
+                engagementLevel = 'Moderate';
+            }
+            
+            document.getElementById('engagementLevel').textContent = engagementLevel;
+            
+            // Get top keywords for summary
+            const topKeywords = Array.from(dashboardData.keywords.entries())
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3)
+                .map(([word]) => word);
+            
+            document.getElementById('keyTopicsSummary').textContent = 
+                topKeywords.length > 0 ? topKeywords.join(', ') : 'None detected';
+        }
+        
+        // Get time ago string
+        function getTimeAgo(timestamp) {
+            const now = new Date();
+            const diff = now - timestamp;
+            const minutes = Math.floor(diff / 60000);
+            
+            if (minutes < 1) return 'Just now';
+            if (minutes === 1) return '1 minute ago';
+            return `${minutes} minutes ago`;
+        }
+        
+        // Event listeners and initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load stored analysis data if available
+            loadStoredAnalysisData();
+            
+            // Download JSON button
+            const downloadJsonBtn = document.getElementById('downloadJsonBtn');
+            if (downloadJsonBtn) {
+                downloadJsonBtn.addEventListener('click', downloadJSON);
+            }
+            
+            // Download Word button
+            const downloadWordBtn = document.getElementById('downloadWordBtn');
+            if (downloadWordBtn) {
+                downloadWordBtn.addEventListener('click', downloadWord);
+            }
+
+            // Email Report button
+            const emailReportBtn = document.getElementById('emailReportBtn');
+            if (emailReportBtn) {
+                emailReportBtn.addEventListener('click', openEmailModal);
+            }
+
+            // Email input validation
+            const emailInput = document.getElementById('recipientEmail');
+            if (emailInput) {
+                emailInput.addEventListener('input', validateEmailInput);
+                emailInput.addEventListener('blur', validateEmailInput);
+                emailInput.addEventListener('keypress', handleEmailKeyPress);
+            }
+
+            // Send email button
+            const sendEmailBtn = document.getElementById('sendEmailBtn');
+            if (sendEmailBtn) {
+                sendEmailBtn.addEventListener('click', sendEmail);
+            }
+            
+            // Call functionality event listeners
+            const startCallBtn = document.getElementById('startCallBtn');
+            if (startCallBtn) {
+                startCallBtn.addEventListener('click', showCallModal);
+            }
+            
+            const initiateCallBtn = document.getElementById('initiateCallBtn');
+            if (initiateCallBtn) {
+                initiateCallBtn.addEventListener('click', startCall);
+            }
+            
+            const endCallBtn = document.getElementById('endCallBtn');
+            if (endCallBtn) {
+                endCallBtn.addEventListener('click', endCall);
+            }
+            
+            const clearTranscriptBtn = document.getElementById('clearTranscriptBtn');
+            if (clearTranscriptBtn) {
+                clearTranscriptBtn.addEventListener('click', clearTranscript);
+            }
+            
+            const downloadTranscriptBtn = document.getElementById('downloadTranscriptBtn');
+            if (downloadTranscriptBtn) {
+                downloadTranscriptBtn.addEventListener('click', downloadTranscript);
+            }
+            
+            // Dashboard controls event listeners
+            const enableLiveSentiment = document.getElementById('enableLiveSentiment');
+            if (enableLiveSentiment) {
+                enableLiveSentiment.addEventListener('change', function() {
+                    const sentimentSection = document.getElementById('liveSentimentSection');
+                    sentimentSection.style.display = this.checked ? 'block' : 'none';
+                });
+            }
+            
+            const enableLiveEmotion = document.getElementById('enableLiveEmotion');
+            if (enableLiveEmotion) {
+                enableLiveEmotion.addEventListener('change', function() {
+                    const emotionSection = document.getElementById('liveEmotionSection');
+                    emotionSection.style.display = this.checked ? 'block' : 'none';
+                });
+            }
+            
+            // Add clear data functionality (optional - for development/testing)
+            const clearDataBtn = document.getElementById('clearDataBtn');
+            if (clearDataBtn) {
+                clearDataBtn.addEventListener('click', function() {
+                    if (confirm('Are you sure you want to clear all stored analysis data?')) {
+                        clearStoredAnalysisData();
+                        showNotification('Analysis data cleared successfully', 'info');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html> 

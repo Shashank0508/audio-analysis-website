@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Transcribe Streaming Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        
+        .status {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+        
+        .status.connected {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.disconnected {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.streaming {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .panel {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .panel h3 {
+            margin-top: 0;
+            color: #495057;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        
+        #live-transcript {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 15px;
+            background: white;
+            border-radius: 5px;
+        }
+        
+        .transcript-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .transcript-item.partial {
+            background-color: #e3f2fd;
+            border-left-color: #2196f3;
+            opacity: 0.8;
+        }
+        
+        .transcript-item.final {
+            background-color: #f1f8e9;
+            border-left-color: #4caf50;
+        }
+        
+        .transcript-item.high-confidence {
+            border-left-width: 4px;
+        }
+        
+        .transcript-item.low-confidence {
+            border-left-width: 2px;
+            opacity: 0.7;
+        }
+        
+        .speaker {
+            font-weight: bold;
+            color: #007bff;
+            margin-right: 10px;
+        }
+        
+        .text {
+            color: #333;
+        }
+        
+        .confidence {
+            font-size: 12px;
+            color: #666;
+            margin-left: 10px;
+        }
+        
+        .timestamp {
+            font-size: 12px;
+            color: #999;
+            float: right;
+        }
+        
+        .speaker-info {
+            background: white;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        
+        .speaker-name {
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 5px;
+        }
+        
+        .speaker-stats {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .speaker-stats span {
+            margin-right: 15px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .stat-label {
+            font-weight: 500;
+        }
+        
+        .stat-value {
+            color: #007bff;
+            font-weight: bold;
+        }
+        
+        .config-panel {
+            margin-bottom: 20px;
+        }
+        
+        .config-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .config-row label {
+            min-width: 120px;
+            font-weight: 500;
+        }
+        
+        .config-row select,
+        .config-row input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .aws-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #dc3545;
+        }
+        
+        .status-indicator.available {
+            background-color: #28a745;
+        }
+        
+        .log-panel {
+            grid-column: 1 / -1;
+            max-height: 200px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 2px 0;
+        }
+        
+        .log-entry.error {
+            color: #dc3545;
+        }
+        
+        .log-entry.info {
+            color: #007bff;
+        }
+        
+        .log-entry.warning {
+            color: #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎙️ AWS Transcribe Streaming Test</h1>
+        
+        <div class="aws-status">
+            <div class="status-indicator" id="aws-indicator"></div>
+            <span id="aws-status-text">Checking AWS Transcribe availability...</span>
+        </div>
+        
+        <div class="config-panel">
+            <h3>Configuration</h3>
+            <div class="config-row">
+                <label for="call-uuid">Call UUID:</label>
+                <input type="text" id="call-uuid" placeholder="Enter call UUID or leave blank for auto-generation">
+            </div>
+            <div class="config-row">
+                <label for="language">Language:</label>
+                <select id="language">
+                    <option value="en-US">English (US)</option>
+                    <option value="en-GB">English (UK)</option>
+                    <option value="es-US">Spanish (US)</option>
+                    <option value="fr-FR">French</option>
+                    <option value="de-DE">German</option>
+                    <option value="it-IT">Italian</option>
+                    <option value="pt-BR">Portuguese (Brazil)</option>
+                    <option value="ja-JP">Japanese</option>
+                    <option value="ko-KR">Korean</option>
+                    <option value="zh-CN">Chinese (Simplified)</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button id="start-btn" class="btn-primary">Start Streaming</button>
+            <button id="stop-btn" class="btn-danger" disabled>Stop Streaming</button>
+            <button id="clear-btn" class="btn-success">Clear Transcript</button>
+        </div>
+        
+        <div class="status disconnected" id="status">
+            Ready to start streaming
+        </div>
+        
+        <div class="grid">
+            <div class="panel">
+                <h3>Live Transcript</h3>
+                <div id="live-transcript"></div>
+            </div>
+            
+            <div class="panel">
+                <h3>Active Speakers</h3>
+                <div id="active-speakers"></div>
+            </div>
+            
+            <div class="panel">
+                <h3>Final Transcript</h3>
+                <div id="final-transcript"></div>
+            </div>
+            
+            <div class="panel">
+                <h3>Session Statistics</h3>
+                <div id="session-stats"></div>
+            </div>
+            
+            <div class="panel log-panel">
+                <h3>System Log</h3>
+                <div id="system-log"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/aws-transcribe-streaming.js"></script>
+    <script>
+        let transcriber = null;
+        let currentCallUuid = null;
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async function() {
+            await initializeTranscriber();
+            setupEventListeners();
+        });
+        
+        async function initializeTranscriber() {
+            try {
+                transcriber = new AWSTranscribeStreaming();
+                
+                // Set up event handlers
+                transcriber.onStreamingStarted = handleStreamingStarted;
+                transcriber.onStreamingStopped = handleStreamingStopped;
+                transcriber.onTranscriptReceived = handleTranscriptReceived;
+                transcriber.onSpeakerChange = handleSpeakerChange;
+                transcriber.onError = handleError;
+                
+                // Wait for AWS check to complete
+                setTimeout(updateAWSStatus, 1000);
+                
+            } catch (error) {
+                logMessage('Error initializing transcriber: ' + error.message, 'error');
+            }
+        }
+        
+        function setupEventListeners() {
+            document.getElementById('start-btn').addEventListener('click', startStreaming);
+            document.getElementById('stop-btn').addEventListener('click', stopStreaming);
+            document.getElementById('clear-btn').addEventListener('click', clearTranscript);
+        }
+        
+        function updateAWSStatus() {
+            const indicator = document.getElementById('aws-indicator');
+            const statusText = document.getElementById('aws-status-text');
+            
+            if (transcriber && transcriber.awsAvailable) {
+                indicator.classList.add('available');
+                statusText.textContent = 'AWS Transcribe Streaming Available';
+                logMessage('AWS Transcribe Streaming is available', 'info');
+            } else {
+                indicator.classList.remove('available');
+                statusText.textContent = 'AWS Transcribe Not Available - Using Simulation Mode';
+                logMessage('AWS Transcribe not available, using simulation mode', 'warning');
+            }
+        }
+        
+        async function startStreaming() {
+            try {
+                // Get configuration
+                const callUuidInput = document.getElementById('call-uuid').value;
+                const language = document.getElementById('language').value;
+                
+                // Generate call UUID if not provided
+                currentCallUuid = callUuidInput || generateCallUuid();
+                
+                // Update UI
+                document.getElementById('start-btn').disabled = true;
+                document.getElementById('stop-btn').disabled = false;
+                updateStatus('Requesting microphone access...', 'streaming');
+                
+                // Start streaming
+                await transcriber.startStreaming(currentCallUuid, language);
+                
+                logMessage(`Started streaming for call: ${currentCallUuid}`, 'info');
+                
+            } catch (error) {
+                handleError(error);
+                document.getElementById('start-btn').disabled = false;
+                document.getElementById('stop-btn').disabled = true;
+            }
+        }
+        
+        async function stopStreaming() {
+            try {
+                updateStatus('Stopping streaming...', 'streaming');
+                
+                await transcriber.stopStreaming();
+                
+                document.getElementById('start-btn').disabled = false;
+                document.getElementById('stop-btn').disabled = true;
+                
+                logMessage('Streaming stopped', 'info');
+                
+            } catch (error) {
+                handleError(error);
+            }
+        }
+        
+        function clearTranscript() {
+            document.getElementById('live-transcript').innerHTML = '';
+            document.getElementById('active-speakers').innerHTML = '';
+            document.getElementById('final-transcript').innerHTML = '';
+            document.getElementById('session-stats').innerHTML = '';
+            
+            logMessage('Transcript cleared', 'info');
+        }
+        
+        function generateCallUuid() {
+            return 'call-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+        }
+        
+        // Event handlers
+        function handleStreamingStarted() {
+            updateStatus('Streaming active - Speak into your microphone', 'connected');
+            logMessage('Streaming started successfully', 'info');
+        }
+        
+        function handleStreamingStopped() {
+            updateStatus('Streaming stopped', 'disconnected');
+            logMessage('Streaming stopped', 'info');
+        }
+        
+        function handleTranscriptReceived(result) {
+            logMessage(`Transcript: [${result.speaker?.name || 'Unknown'}] ${result.text}`, 'info');
+        }
+        
+        function handleSpeakerChange(speaker) {
+            logMessage(`Speaker changed: ${speaker.name}`, 'info');
+        }
+        
+        function handleError(error) {
+            updateStatus('Error: ' + error.message, 'disconnected');
+            logMessage('Error: ' + error.message, 'error');
+        }
+        
+        function updateStatus(message, type) {
+            const statusElement = document.getElementById('status');
+            statusElement.textContent = message;
+            statusElement.className = 'status ' + type;
+        }
+        
+        function logMessage(message, type = 'info') {
+            const logContainer = document.getElementById('system-log');
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry ' + type;
+            logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+            
+            // Keep only last 100 log entries
+            const entries = logContainer.querySelectorAll('.log-entry');
+            if (entries.length > 100) {
+                entries[0].remove();
+            }
+        }
+    </script>
+</body>
+</html> 
